@@ -68,12 +68,34 @@ function drawDiskPathLoc(arr) {
         }
     }
 }
+let animationId = null;
 function drawAL(arr) {
-    for (let i = 0; i < arr.length - 1; ++i) {
-        const start = [arr[i] + padding, line_pos + 15 + 3 * i];
-        const end = [arr[i + 1] + padding, start[1] + 3];
-        draw("red", start[0], start[1], end[0], end[1], 1);
+    if (animationId !== null) {
+        cancelAnimationFrame(animationId);
     }
+    let i = 0;
+    const interval = 30;
+    function animate(timestamp) {
+        if (i >= arr.length - 1) {
+            animationId = null;
+            return;
+        }
+        const start = [arr[i] + padding, line_pos + 15 + 3 * i];
+        const endPt = [arr[i + 1] + padding, start[1] + 3];
+        draw("red", start[0], start[1], endPt[0], endPt[1], 1);
+        i++;
+        animationId = setTimeout(() => {
+            animationId = requestAnimationFrame(animate);
+        }, interval);
+    }
+    animationId = requestAnimationFrame(animate);
+}
+function calculateTotalLen(arr) {
+    let sum = 0;
+    for (let i = 0; i < arr.length - 1; i++) {
+        sum = Math.abs(arr[i] - arr[i + 1]) + sum;
+    }
+    return sum;
 }
 function FCFS(arr) {
     drawAL(arr);
@@ -127,33 +149,34 @@ function C_SCAN(arr, direction) {
     }
     drawAL(result_C_SCAN);
 }
-const FCFS_button = document.getElementById("FCFS");
-FCFS_button.addEventListener("click", () => {
+function resetCanvas() {
+    if (animationId !== null) {
+        cancelAnimationFrame(animationId);
+        animationId = null;
+    }
     ctx.clearRect(0, 0, app.width, app.height);
     draw("white", padding, line_pos, app.width - padding, line_pos, 3);
     drawDiskPathLoc(disk_schedule_arr);
+}
+const FCFS_button = document.getElementById("FCFS");
+FCFS_button.addEventListener("click", () => {
+    resetCanvas();
     FCFS(disk_schedule_arr);
 });
 const SSTF_button = document.getElementById("SSTF");
 SSTF_button.addEventListener("click", () => {
-    ctx.clearRect(0, 0, app.width, app.height);
-    draw("white", padding, line_pos, app.width - padding, line_pos, 3);
-    drawDiskPathLoc(disk_schedule_arr);
+    resetCanvas();
     SSTF(disk_schedule_arr);
 });
 const SCAN_button = document.getElementById("SCAN");
 SCAN_button.addEventListener("click", () => {
-    ctx.clearRect(0, 0, app.width, app.height);
-    draw("white", padding, line_pos, app.width - padding, line_pos, 3);
-    drawDiskPathLoc(disk_schedule_arr);
+    resetCanvas();
     // need to create a chose box for direction
     SCAN(disk_schedule_arr, 1);
 });
 const C_SCAN_button = document.getElementById("C_SCAN");
 C_SCAN_button.addEventListener("click", () => {
-    ctx.clearRect(0, 0, app.width, app.height);
-    draw("white", padding, line_pos, app.width - padding, line_pos, 3);
-    drawDiskPathLoc(disk_schedule_arr);
+    resetCanvas();
     // need to create a chose box for direction
     C_SCAN(disk_schedule_arr, 1);
 });
