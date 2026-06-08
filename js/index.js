@@ -17,6 +17,7 @@ const padding = 10;
 const current_path = Math.floor(Math.random() * 1500);
 const quantity = 400;
 let direction = 1;
+let totalLen = 0;
 function draw(color, start_x, start_y, end_x, end_y, lineWidth) {
     ctx.beginPath();
     ctx.strokeStyle = color;
@@ -96,7 +97,8 @@ function calculateTotalLen(arr) {
     for (let i = 0; i < arr.length - 1; i++) {
         sum = Math.abs(arr[i] - arr[i + 1]) + sum;
     }
-    return sum;
+    const box = document.getElementById("outputbox");
+    box.innerText = `Total Length: ${sum}`;
 }
 function setDirection() {
     let d = 0;
@@ -117,6 +119,7 @@ function setDirection() {
 }
 function FCFS(arr) {
     drawAL(arr);
+    calculateTotalLen(arr);
 }
 function SSTF(arr) {
     const visited_SSTF = new Array(arr.length).fill(false);
@@ -138,6 +141,7 @@ function SSTF(arr) {
         visited_SSTF[nextIdx] = true;
     }
     drawAL(result_SSTF);
+    calculateTotalLen(result_SSTF);
 }
 function SCAN(arr, direction) {
     const start = arr[0];
@@ -152,6 +156,7 @@ function SCAN(arr, direction) {
         result_SCAN.push(...right, ...left);
     }
     drawAL(result_SCAN);
+    calculateTotalLen(result_SCAN);
 }
 function C_SCAN(arr, direction) {
     const start = arr[0];
@@ -168,6 +173,7 @@ function C_SCAN(arr, direction) {
         result_C_SCAN.push(...right, ...left);
     }
     drawAL(result_C_SCAN);
+    calculateTotalLen(result_C_SCAN);
 }
 function resetCanvas() {
     if (animationId !== null) {

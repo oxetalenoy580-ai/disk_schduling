@@ -22,6 +22,7 @@ const padding = 10;
 const current_path = Math.floor(Math.random() * 1500);
 const quantity = 400;
 let direction = 1;
+let totalLen = 0;
 
 function draw(
   color: string,
@@ -133,12 +134,13 @@ function drawAL(arr: Disk_Path_Arr) {
   animationId = requestAnimationFrame(animate);
 }
 
-function calculateTotalLen(arr: Disk_Path_Arr): number {
+function calculateTotalLen(arr: Disk_Path_Arr) {
   let sum = 0;
   for (let i = 0; i < arr.length - 1; i++) {
     sum = Math.abs(arr[i] - arr[i + 1]) + sum;
   }
-  return sum;
+  const box = document.getElementById("outputbox") as HTMLDivElement;
+  box.innerText = `Total Length: ${sum}`;
 }
 
 function setDirection(): number {
@@ -161,6 +163,7 @@ function setDirection(): number {
 
 function FCFS(arr: Disk_Path_Arr) {
   drawAL(arr);
+  calculateTotalLen(arr);
 }
 
 function SSTF(arr: Disk_Path_Arr) {
@@ -183,6 +186,7 @@ function SSTF(arr: Disk_Path_Arr) {
     visited_SSTF[nextIdx] = true;
   }
   drawAL(result_SSTF);
+  calculateTotalLen(result_SSTF);
 }
 
 function SCAN(arr: Disk_Path_Arr, direction: number) {
@@ -199,6 +203,7 @@ function SCAN(arr: Disk_Path_Arr, direction: number) {
     result_SCAN.push(...right, ...left);
   }
   drawAL(result_SCAN);
+  calculateTotalLen(result_SCAN);
 }
 
 function C_SCAN(arr: Disk_Path_Arr, direction: number) {
@@ -217,6 +222,7 @@ function C_SCAN(arr: Disk_Path_Arr, direction: number) {
     result_C_SCAN.push(...right, ...left);
   }
   drawAL(result_C_SCAN);
+  calculateTotalLen(result_C_SCAN);
 }
 
 function resetCanvas() {
