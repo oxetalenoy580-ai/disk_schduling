@@ -1,16 +1,48 @@
 <!doctype html>
-<html>
+<html lang="en">
   <head>
-    <title>Disk Scheduling</title>
+    <title>Disk Scheduling Visualizer</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link rel="stylesheet" href="css/main.css" />
   </head>
   <body>
-    <h1>Disk Scheduling</h1>
-    <b><button type="button" id="FCFS">FCFS</button></b>
-    <b><button type="button" id="SSTF">SSTF</button></b>
-    <b><button type="button" id="SCAN">SCAN</button></b>
-    <b><button type="button" id="C_SCAN">C_SCAN</button></b>
-    <canvas id="app"></canvas>
+    <div class="container">
+      <header>
+        <h1>Disk Scheduling</h1>
+        <p class="subtitle">Algorithm Visualizer</p>
+      </header>
+
+      <div class="controls">
+        <div class="control-group">
+          <label class="group-label">Direction:</label>
+          <div class="radio-group">
+            <label class="radio">
+              <input type="radio" name="direction" value="left" />
+              <span class="radio-label">← Left</span>
+            </label>
+            <label class="radio">
+              <input type="radio" name="direction" value="right" checked />
+              <span class="radio-label">Right →</span>
+            </label>
+          </div>
+        </div>
+
+        <div class="control-group">
+          <label class="group-label">Algorithm:</label>
+          <div class="btn-group">
+            <button type="button" id="FCFS">FCFS</button>
+            <button type="button" id="SSTF">SSTF</button>
+            <button type="button" id="SCAN">SCAN</button>
+            <button type="button" id="C_SCAN">C-SCAN</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="canvas-wrapper">
+        <canvas id="app"></canvas>
+      </div>
+    </div>
     <script src="js/index.js"></script>
   </body>
 </html>

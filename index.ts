@@ -21,6 +21,7 @@ const line_pos = 30;
 const padding = 10;
 const current_path = Math.floor(Math.random() * 1500);
 const quantity = 400;
+let direction = 1;
 
 function draw(
   color: string,
@@ -114,9 +115,9 @@ function drawAL(arr: Disk_Path_Arr) {
   }
 
   let i = 0;
-  const interval = 30;
+  const interval = 20;
 
-  function animate(timestamp: number) {
+  function animate() {
     if (i >= arr.length - 1) {
       animationId = null;
       return;
@@ -138,6 +139,24 @@ function calculateTotalLen(arr: Disk_Path_Arr): number {
     sum = Math.abs(arr[i] - arr[i + 1]) + sum;
   }
   return sum;
+}
+
+function setDirection(): number {
+  let d = 0;
+  const direction_nodelist = document.getElementsByName("direction");
+  for (let i = 0; i <= 1; i++) {
+    if ((direction_nodelist[i] as HTMLInputElement).checked) {
+      switch (i) {
+        case 0:
+          d = -1;
+          break;
+        case 1:
+          d = 1;
+          break;
+      }
+    }
+  }
+  return d;
 }
 
 function FCFS(arr: Disk_Path_Arr) {
@@ -187,10 +206,12 @@ function C_SCAN(arr: Disk_Path_Arr, direction: number) {
   const requests = arr.slice(1).sort((a, b) => a - b);
   const result_C_SCAN: Disk_Path_Arr = [start];
 
-  const left = requests.filter((r) => r <= start);
-  const right = requests.filter((r) => r >= start);
+  let left = requests.filter((r) => r <= start);
+  let right = requests.filter((r) => r >= start);
 
   if (direction === -1) {
+    left = left.reverse();
+    right = right.reverse();
     result_C_SCAN.push(...left, ...right);
   } else {
     result_C_SCAN.push(...right, ...left);
@@ -223,12 +244,13 @@ SSTF_button.addEventListener("click", () => {
 const SCAN_button = document.getElementById("SCAN") as HTMLButtonElement;
 SCAN_button.addEventListener("click", () => {
   resetCanvas();
-  // need to create a chose box for direction
-  SCAN(disk_schedule_arr, 1);
+  direction = setDirection();
+  SCAN(disk_schedule_arr, direction);
 });
+
 const C_SCAN_button = document.getElementById("C_SCAN") as HTMLButtonElement;
 C_SCAN_button.addEventListener("click", () => {
   resetCanvas();
-  // need to create a chose box for direction
-  C_SCAN(disk_schedule_arr, 1);
+  direction = setDirection();
+  C_SCAN(disk_schedule_arr, direction);
 });
