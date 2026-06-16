@@ -32,7 +32,7 @@ for (let y = 0; y < app.height; y += 50) {
 }
 const line_pos = 30;
 const padding = 10;
-const current_path = Math.floor(Math.random() * 1500);
+let current_path;
 const quantity = 400;
 let direction = 1;
 function draw(color, start_x, start_y, end_x, end_y, lineWidth, glowColor, glowSize) {
@@ -91,8 +91,7 @@ function gernerateDiskScheduleArr() {
     chaosArr(disk_schedule_arr);
     return disk_schedule_arr;
 }
-const disk_schedule_arr = gernerateDiskScheduleArr();
-disk_schedule_arr.unshift(current_path);
+let disk_schedule_arr;
 function drawTrackScale() {
     ctx.save();
     for (let v = 0; v <= 1500; v += 250) {
@@ -308,6 +307,25 @@ function resetCanvas() {
     }
     drawDiskPathLoc(disk_schedule_arr);
 }
+function generate() {
+    if (animationId !== null) {
+        cancelAnimationFrame(animationId);
+        animationId = null;
+    }
+    current_path = Math.floor(Math.random() * 1500);
+    disk_schedule_arr = gernerateDiskScheduleArr();
+    disk_schedule_arr.unshift(current_path);
+    const pathEl = document.getElementById("pathoutputbox");
+    const pathValEl = pathEl.querySelector(".stat-value");
+    if (pathValEl)
+        pathValEl.innerText = String(current_path);
+    const distEl = document.getElementById("outputbox");
+    const distValEl = distEl.querySelector(".stat-value");
+    if (distValEl)
+        distValEl.innerText = "0";
+    resetCanvas();
+}
+generate();
 const FCFS_button = document.getElementById("FCFS");
 FCFS_button.addEventListener("click", () => {
     resetCanvas();
@@ -330,4 +348,6 @@ C_SCAN_button.addEventListener("click", () => {
     direction = setDirection();
     C_SCAN(disk_schedule_arr, direction);
 });
+const generateBtn = document.getElementById("generateBtn");
+generateBtn.addEventListener("click", generate);
 //# sourceMappingURL=index.js.map

@@ -39,7 +39,7 @@ for (let y = 0; y < app.height; y += 50) {
 
 const line_pos = 30;
 const padding = 10;
-const current_path = Math.floor(Math.random() * 1500);
+let current_path: Disk_Path;
 const quantity = 400;
 let direction = 1;
 
@@ -119,8 +119,7 @@ function gernerateDiskScheduleArr() {
   return disk_schedule_arr;
 }
 
-const disk_schedule_arr = gernerateDiskScheduleArr();
-disk_schedule_arr.unshift(current_path);
+let disk_schedule_arr: Disk_Path_Arr;
 
 function drawTrackScale() {
   ctx.save();
@@ -368,6 +367,28 @@ function resetCanvas() {
   drawDiskPathLoc(disk_schedule_arr);
 }
 
+function generate() {
+  if (animationId !== null) {
+    cancelAnimationFrame(animationId);
+    animationId = null;
+  }
+  current_path = Math.floor(Math.random() * 1500);
+  disk_schedule_arr = gernerateDiskScheduleArr();
+  disk_schedule_arr.unshift(current_path);
+
+  const pathEl = document.getElementById("pathoutputbox") as HTMLElement;
+  const pathValEl = pathEl.querySelector(".stat-value") as HTMLElement | null;
+  if (pathValEl) pathValEl.innerText = String(current_path);
+
+  const distEl = document.getElementById("outputbox") as HTMLElement;
+  const distValEl = distEl.querySelector(".stat-value") as HTMLElement | null;
+  if (distValEl) distValEl.innerText = "0";
+
+  resetCanvas();
+}
+
+generate();
+
 const FCFS_button = document.getElementById("FCFS") as HTMLButtonElement;
 FCFS_button.addEventListener("click", () => {
   resetCanvas();
@@ -393,3 +414,6 @@ C_SCAN_button.addEventListener("click", () => {
   direction = setDirection();
   C_SCAN(disk_schedule_arr, direction);
 });
+
+const generateBtn = document.getElementById("generateBtn") as HTMLButtonElement;
+generateBtn.addEventListener("click", generate);
