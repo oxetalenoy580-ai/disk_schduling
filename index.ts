@@ -14,15 +14,34 @@ const ctx = app.getContext("2d")!;
 if (ctx === null) {
   throw new Error(`can not init context`);
 }
-ctx.fillStyle = "#202020";
+
+const bgGrad = ctx.createLinearGradient(0, 0, 0, app.height);
+bgGrad.addColorStop(0, "#07070d");
+bgGrad.addColorStop(0.5, "#0f0f18");
+bgGrad.addColorStop(1, "#14141e");
+ctx.fillStyle = bgGrad;
 ctx.fillRect(0, 0, app.width, app.height);
+
+ctx.strokeStyle = "rgba(255,255,255,0.03)";
+ctx.lineWidth = 1;
+for (let x = 0; x < app.width; x += 50) {
+  ctx.beginPath();
+  ctx.moveTo(x, 0);
+  ctx.lineTo(x, app.height);
+  ctx.stroke();
+}
+for (let y = 0; y < app.height; y += 50) {
+  ctx.beginPath();
+  ctx.moveTo(0, y);
+  ctx.lineTo(app.width, y);
+  ctx.stroke();
+}
 
 const line_pos = 30;
 const padding = 10;
 const current_path = Math.floor(Math.random() * 1500);
 const quantity = 400;
 let direction = 1;
-let totalLen = 0;
 
 function draw(
   color: string,
@@ -31,13 +50,42 @@ function draw(
   end_x: number,
   end_y: number,
   lineWidth: number,
+  glowColor?: string,
+  glowSize?: number,
 ) {
+  ctx.save();
   ctx.beginPath();
   ctx.strokeStyle = color;
   ctx.moveTo(start_x, start_y);
   ctx.lineTo(end_x, end_y);
   ctx.lineWidth = lineWidth;
+  ctx.lineCap = "round";
+  if (glowColor && glowSize) {
+    ctx.shadowColor = glowColor;
+    ctx.shadowBlur = glowSize;
+  }
   ctx.stroke();
+  ctx.restore();
+}
+
+function drawCircle(
+  x: number,
+  y: number,
+  radius: number,
+  color: string,
+  glowColor?: string,
+  glowSize?: number,
+) {
+  ctx.save();
+  ctx.beginPath();
+  ctx.arc(x, y, radius, 0, Math.PI * 2);
+  ctx.fillStyle = color;
+  if (glowColor && glowSize) {
+    ctx.shadowColor = glowColor;
+    ctx.shadowBlur = glowSize;
+  }
+  ctx.fill();
+  ctx.restore();
 }
 
 function randomInRange(min: number, max: number): number {
@@ -74,38 +122,74 @@ function gernerateDiskScheduleArr() {
 const disk_schedule_arr = gernerateDiskScheduleArr();
 disk_schedule_arr.unshift(current_path);
 
-function drawDiskPathLoc(arr: Disk_Path_Arr) {
-  for (let i = 0; i < arr.length; ++i) {
-    if (i == 0) {
-      draw(
-        "red",
-        padding + current_path,
-        line_pos - 10,
-        padding + current_path,
-        line_pos,
-        1,
-      );
-    }
-    if (i > 0 && i % 2 == 0) {
-      draw(
-        "blue",
-        padding + arr[i],
-        line_pos - 10,
-        padding + arr[i],
-        line_pos,
-        1,
-      );
-    } else {
-      draw(
-        "blue",
-        padding + arr[i],
-        line_pos + 10,
-        padding + arr[i],
-        line_pos,
-        1,
-      );
-    }
+function drawTrackScale() {
+  ctx.save();
+  for (let v = 0; v <= 1500; v += 250) {
+    const x = padding + v;
+    ctx.beginPath();
+    ctx.strokeStyle = "rgba(255,255,255,0.1)";
+    ctx.lineWidth = 1;
+    ctx.moveTo(x, line_pos - 12);
+    ctx.lineTo(x, line_pos + 12);
+    ctx.stroke();
+    ctx.fillStyle = "rgba(255,255,255,0.3)";
+    ctx.font = "9px 'Courier New', monospace";
+    ctx.textAlign = "center";
+    ctx.textBaseline = "top";
+    ctx.fillText(String(v), x, line_pos + 15);
   }
+  ctx.restore();
+}
+
+function drawDiskPathLoc(arr: Disk_Path_Arr) {
+  ctx.save();
+  ctx.beginPath();
+  ctx.strokeStyle = "rgba(6, 182, 212, 0.25)";
+  ctx.lineWidth = 8;
+  ctx.moveTo(padding, line_pos);
+  ctx.lineTo(app.width - padding, line_pos);
+  ctx.shadowColor = "#06b6d4";
+  ctx.shadowBlur = 30;
+  ctx.stroke();
+  ctx.restore();
+
+  const trackGrad = ctx.createLinearGradient(
+    padding,
+    0,
+    app.width - padding,
+    0,
+  );
+  trackGrad.addColorStop(0, "#0891b2");
+  trackGrad.addColorStop(0.5, "#22d3ee");
+  trackGrad.addColorStop(1, "#0891b2");
+  ctx.save();
+  ctx.beginPath();
+  ctx.strokeStyle = trackGrad;
+  ctx.lineWidth = 2;
+  ctx.moveTo(padding, line_pos);
+  ctx.lineTo(app.width - padding, line_pos);
+  ctx.stroke();
+  ctx.restore();
+
+  drawTrackScale();
+
+  for (let i = 0; i < arr.length; ++i) {
+    const x = padding + arr[i];
+    const side = i % 2 === 0 ? -1 : 1;
+    const y = line_pos + side * 8;
+    const color = side === -1 ? "#a78bfa" : "#22d3ee";
+    drawCircle(x, y, 2.5, color, color, 6);
+  }
+
+  const cx = padding + arr[0];
+  drawCircle(cx, line_pos, 5, "#fbbf24", "#fbbf24", 20);
+  ctx.save();
+  ctx.beginPath();
+  ctx.arc(cx, line_pos, 12, 0, Math.PI * 2);
+  ctx.strokeStyle = "rgba(251, 191, 36, 0.3)";
+  ctx.lineWidth = 2;
+  ctx.stroke();
+  ctx.restore();
 }
 
 let animationId: number | null = null;
@@ -117,19 +201,41 @@ function drawAL(arr: Disk_Path_Arr) {
 
   let i = 0;
   const interval = 20;
+  const total = arr.length - 1;
+  let lastTime = 0;
 
-  function animate() {
-    if (i >= arr.length - 1) {
+  function animate(timestamp: number) {
+    if (i >= total) {
       animationId = null;
       return;
     }
-    const start = [arr[i] + padding, line_pos + 15 + 3 * i];
-    const endPt = [arr[i + 1] + padding, start[1] + 3];
-    draw("red", start[0], start[1], endPt[0], endPt[1], 1);
-    i++;
-    animationId = setTimeout(() => {
+
+    if (timestamp - lastTime < interval) {
       animationId = requestAnimationFrame(animate);
-    }, interval);
+      return;
+    }
+    lastTime = timestamp;
+
+    const t = total > 0 ? i / total : 0;
+    const hue = 220 - t * 180;
+    const color = `hsl(${hue}, 90%, 55%)`;
+
+    const startPt = [arr[i] + padding, line_pos + 15 + 3 * i];
+    const endPt = [arr[i + 1] + padding, startPt[1] + 3];
+
+    draw(color, startPt[0], startPt[1], endPt[0], endPt[1], 2.5, color, 6);
+    drawCircle(endPt[0], endPt[1], 4, "#fbbf24", "#fbbf24", 12);
+
+    const pathEl = document.getElementById("pathoutputbox") as HTMLElement;
+    const valEl = pathEl.querySelector(".stat-value") as HTMLElement | null;
+    if (valEl) {
+      valEl.innerText = String(arr[i]);
+    } else {
+      pathEl.innerText = `Current Path: ${arr[i]}`;
+    }
+
+    i++;
+    animationId = requestAnimationFrame(animate);
   }
   animationId = requestAnimationFrame(animate);
 }
@@ -139,8 +245,13 @@ function calculateTotalLen(arr: Disk_Path_Arr) {
   for (let i = 0; i < arr.length - 1; i++) {
     sum = Math.abs(arr[i] - arr[i + 1]) + sum;
   }
-  const box = document.getElementById("outputbox") as HTMLDivElement;
-  box.innerText = `Total Length: ${sum}`;
+  const distEl = document.getElementById("outputbox") as HTMLElement;
+  const valEl = distEl.querySelector(".stat-value") as HTMLElement | null;
+  if (valEl) {
+    valEl.innerText = String(sum);
+  } else {
+    distEl.innerText = `Total Length: ${sum}`;
+  }
 }
 
 function setDirection(): number {
@@ -231,7 +342,29 @@ function resetCanvas() {
     animationId = null;
   }
   ctx.clearRect(0, 0, app.width, app.height);
-  draw("white", padding, line_pos, app.width - padding, line_pos, 3);
+
+  const g = ctx.createLinearGradient(0, 0, 0, app.height);
+  g.addColorStop(0, "#07070d");
+  g.addColorStop(0.5, "#0f0f18");
+  g.addColorStop(1, "#14141e");
+  ctx.fillStyle = g;
+  ctx.fillRect(0, 0, app.width, app.height);
+
+  ctx.strokeStyle = "rgba(255,255,255,0.03)";
+  ctx.lineWidth = 1;
+  for (let x = 0; x < app.width; x += 50) {
+    ctx.beginPath();
+    ctx.moveTo(x, 0);
+    ctx.lineTo(x, app.height);
+    ctx.stroke();
+  }
+  for (let y = 0; y < app.height; y += 50) {
+    ctx.beginPath();
+    ctx.moveTo(0, y);
+    ctx.lineTo(app.width, y);
+    ctx.stroke();
+  }
+
   drawDiskPathLoc(disk_schedule_arr);
 }
 

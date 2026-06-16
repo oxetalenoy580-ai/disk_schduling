@@ -1,4 +1,6 @@
-*, *::before, *::after {
+*,
+*::before,
+*::after {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
@@ -7,7 +9,11 @@
 body {
   background: #0f0f14;
   color: #e0e0e0;
-  font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+  font-family:
+    "Segoe UI",
+    system-ui,
+    -apple-system,
+    sans-serif;
   min-height: 100vh;
   display: flex;
   justify-content: center;
@@ -15,7 +21,7 @@ body {
 }
 
 .container {
-  max-width: 960px;
+  max-width: 1080px;
   width: 100%;
 }
 
@@ -29,11 +35,15 @@ h1 {
   font-weight: 700;
   color: #f0f0f0;
   letter-spacing: -0.02em;
+  background: linear-gradient(135deg, #22d3ee, #a78bfa);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
 .subtitle {
   font-size: 0.85rem;
-  color: #888;
+  color: #666;
   margin-top: 0.25rem;
 }
 
@@ -46,7 +56,7 @@ h1 {
   flex-wrap: wrap;
   gap: 1.5rem;
   align-items: center;
-  margin-bottom: 1rem;
+  margin-bottom: 0.75rem;
 }
 
 .control-group {
@@ -136,6 +146,63 @@ h1 {
   transform: translateY(0);
 }
 
+/* ── Stats Bar ── */
+.stats-bar {
+  background: #1a1a24;
+  border: 1px solid #2a2a38;
+  border-radius: 12px;
+  padding: 0.65rem 1.25rem;
+  display: flex;
+  align-items: center;
+  gap: 0;
+  margin-bottom: 0.75rem;
+}
+
+.stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.15rem;
+  padding: 0.25rem 1.25rem;
+  flex: 1;
+  min-width: 0;
+}
+
+.stat-label {
+  font-size: 0.65rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #666;
+  white-space: nowrap;
+}
+
+.stat-value {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #f0f0f0;
+  font-family: "JetBrains Mono", "Fira Code", "Courier New", monospace;
+  transition: color 0.2s;
+}
+
+.stat-divider {
+  width: 1px;
+  height: 2rem;
+  background: #2a2a38;
+  flex-shrink: 0;
+}
+
+/* Highlight the two dynamic stats */
+#pathoutputbox .stat-value,
+#outputbox .stat-value {
+  color: #22d3ee;
+}
+
+#pathoutputbox .stat-value {
+  color: #fbbf24;
+}
+
+/* ── Canvas ── */
 .canvas-wrapper {
   background: #1a1a24;
   border: 1px solid #2a2a38;
@@ -143,19 +210,6 @@ h1 {
   padding: 0.75rem;
   display: flex;
   justify-content: center;
-}
-
-.output-box {
-  background: #1a1a24;
-  border: 1px solid #2a2a38;
-  border-radius: 12px;
-  padding: 0.75rem 1.5rem;
-  margin-bottom: 1rem;
-  font-size: 1rem;
-  font-weight: 600;
-  color: #f0f0f0;
-  text-align: center;
-  font-family: "Courier New", monospace;
 }
 
 canvas {
